@@ -1,5 +1,6 @@
 module DiscreteChoice
 
-# package code goes here
+include(newton.jl)
+include(btr.jl)
 
-end # module
+end
