@@ -1,15 +1,15 @@
-immutable basictrustregion{T<:Real}
+immutable trustregion{T<:Real}
     η1::T
     η2::T
     γ1::T
     γ2::T
 end
 
-function btrdefaults()
-    return basictrustregion(0.01, 0.9, 0.5, 0.5)
+function trdefaults()
+    return trustregion(0.01, 0.9, 0.5, 0.5)
 end
 
-type btrstate
+type trstate
     iter::Int64
     x::Vector
     xcand::Vector
@@ -17,16 +17,16 @@ type btrstate
     step::Vector
     Δ::Float64
     ρ::Float64
-    tol::Float64
+    δ::Float64
 
-    function btrstate()
+    function trstate()
         state = new()
-        state.tol = 1e-6
+        state.δ = 1e-6
         return state
     end
 end
 
-function acceptcandidate!(state::btrstate, b::basictrustregion)
+function acceptcandidate!(state::trstate, b::trustregion)
     if state.ρ >= b.η1
         return true
     else
@@ -34,10 +34,10 @@ function acceptcandidate!(state::btrstate, b::basictrustregion)
     end
 end
 
-function updateradius!(state::btrstate, b::basictrustregion)
+function updateradius!(state::trstate, b::trustregion)
     if state.ρ >= b.η2
         stepnorm = norm(state.step)
-        state.Δ = min(1e20, max(4*stepnorm, state.Δ))
+        state.Δ = min(1e20, max(4 * stepnorm, state.Δ))
     elseif state.ρ >= b.η1
         state.Δ *= b.γ2
     else
@@ -45,8 +45,31 @@ function updateradius!(state::btrstate, b::basictrustregion)
     end
 end
 
+function cg(A::Matrix, b::Vector, x0::Vector, δ::Float64 = 1e-6)
+    n = length(x0)
+    x = x0
+    g = b + A * x
+    d = -g
+    k = 0
+    δ *= δ
+    while dot(g, g) > δ
+        Ad = A * d
+        normd = dot(d, Ad)
+        α = -dot(d, g) / normd
+        x += α * d
+        g = b + A *x
+        γ = dot(g, Ad) / normd
+        d = -g + γ * d
+        k += 1
+    end
+    normd = dot(d, A * d)
+    α = -dot(d, g) / normd
+    x += α * d
+    return x
+end
+
 function truncatedcg(g::Vector, H::Matrix, Δ::Float64)
-    n = length(g)
+    n::Int64 = length(g)
     s = zeros(n)
     normg0 = norm(g)
     v = g
@@ -55,7 +78,7 @@ function truncatedcg(g::Vector, H::Matrix, Δ::Float64)
     norm2d = gv
     norm2s = 0
     sMd = 0
-    k = 0
+    k::Int64 = 0
     Δ *= Δ
     while !stopcg(norm(g), normg0, k, n)
         Hd = H*d
@@ -96,15 +119,13 @@ function stopcg(normg::Float64, normg0::Float64, k::Int64, kmax::Int64)
     end
 end
 
-function btr(f::Function, g!::Function,
-             H!::Function, Step::Function,
-             x0::Vector, state::btrstate = btrstate(),
-             maxiter::Int64, approxh::Bool = false)
-    b = btrdefaults()
+function tr(f::Function, g!::Function, H!::Function,
+            step::Function, x0::Vector, state::trstate = trstate(), maxiter::Int64 = 500, approxh::Bool = false)
+    b = trdefaults()
     state.iter = 0
     state.x = x0
-    n = length(x0)
-    tol = state.tol * state.tol
+    n::Int64 = length(x0)
+    δ = state.δ * state.δ
     state.g = zeros(n)
     H = eye(n, n)
     fx = f(x0)
@@ -121,11 +142,14 @@ function btr(f::Function, g!::Function,
         return dot(s, g) + 0.5 * dot(s, H * s)
     end
 
-    while dot(state.g, state.g) > tol && state.iter < maxiter
-        state.step = Step(state.g, H, state.Δ)
+    while dot(state.g, state.g) > δ && state.iter < maxiter
+        #if truncatedcg
+        state.step = step(state.g, H, state.Δ)
+        #elseif cg
+        #state.step = step(H, state.g, x0)
         state.xcand = state.x + state.step
         fcand = f(state.xcand)
-        state.ρ = (fcand - fx)/(model(state.step, state.g, H))
+        state.ρ = (fcand - fx) / (model(state.step, state.g, H))
         if approxh
             g!(state.xcand, gcand)
             y = gcand - state.g
