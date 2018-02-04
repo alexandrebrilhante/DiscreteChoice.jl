@@ -1,6 +1,12 @@
-module DiscreteChoice
+__precompile__(true)
 
-include(newton.jl)
-include(btr.jl)
+module DiscreteChoice
+    export gradientdescent,
+           newton,
+           trustregion
+
+include("optimizers/gradientdescent.jl")
+include("optimizers/newton.jl")
+include("optimizers/trustregion.jl")
 
 end
