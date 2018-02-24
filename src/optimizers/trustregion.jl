@@ -11,10 +11,10 @@ end
 
 mutable struct TrustRegionState
     iter::Int64
-    x::Vector{Float64}
-    xcand::Vector{Float64}
-    g::Vector{Float64}
-    step::Vector{Float64}
+    x::Vector
+    xcand::Vector
+    g::Vector
+    step::Vector
     Δ::Float64
     ρ::Float64
     δ::Float64
@@ -29,9 +29,8 @@ end
 function acceptcandidate!(state::TrustRegionState, tr::TrustRegion)
     if state.ρ >= tr.η1
         return true
-    else
-        return false
     end
+    return false
 end
 
 function updateradius!(state::TrustRegionState, tr::TrustRegion)
@@ -45,22 +44,20 @@ function updateradius!(state::TrustRegionState, tr::TrustRegion)
     end
 end
 
-function cg(A::Matrix{Float64}, b::Vector{Float64},
-            x0::Vector{Float64}, δ::Float64 = 1e-6)
+function cg(A::Matrix, b::Vector, x0::Vector, δ::Float64 = 1e-6)
     n = length(x0)
     x = x0
     g = b + A * x
     d = -g
     k::Int64 = 0
-    δ *= δ
     while dot(g, g) > δ
         Ad = A * d
         normd = dot(d, Ad)
         α = -dot(d, g) / normd
         x += α * d
-        g = b + A *x
-        γ = dot(g, Ad) / normd
-        d = -g + γ * d
+        g = b + A * x
+        β = dot(g, Ad) / normd
+        d = -g + β * d
         k += 1
     end
     normd = dot(d, A * d)
@@ -69,18 +66,16 @@ function cg(A::Matrix{Float64}, b::Vector{Float64},
     return x
 end
 
-function truncatedcg(g::Vector{Float64}, H::Matrix{Float64}, Δ::Float64)
+function tcg(H::Matrix, g::Vector, Δ::Float64)
     n::Int64 = length(g)
     s = zeros(n)
     normg0 = norm(g)
     v = g
     d = -v
-    gv = dot(g, v)
-    norm2d = gv
+    norm2d = gv = dot(g, v)
     norm2s::Float64 = 0.0
     sMd::Float64 = 0.0
     k::Int64 = 0
-    Δ *= Δ
     while !stopcg(norm(g), normg0, k, n)
         Hd = H * d
         κ = dot(d, Hd)
@@ -115,62 +110,60 @@ function stopcg(normg::Float64, normg0::Float64, k::Int64, kmax::Int64)
     θ::Float64 = 0.5
     if k == kmax || normg <= normg0 * min(χ, normg0^θ)
         return true
-    else
-        return false
     end
+    return false
 end
 
-function tr(f::Function, g::Function, H::Function,
-            step::Function, x0::Vector{Float64}, maxiter::Int64 = 1000,
-            approxH::Bool = false)
+function tr(f::Function, g!::Function, H!::Function,
+            step::Function, x0::Vector, approxh::Bool = false)
     state::TrustRegionState = TrustRegionState()
     tr = trdefaults()
-    state.iter = 0
+    state.k = 0
     state.x = x0
-    n::Int64 = length(x0)
-    δ = state.δ * state.δ
+    n = length(state.x)
     state.g = zeros(n)
     H = eye(n, n)
-    fx = f(x0)
-    g(x0, state.g)
-    state.Δ = 0.1 * norm(state.g)
-    if approxH
+    fx = f(state.x)
+    g!(state.x, state.g)
+    state.Δ = 1.0
+    if approxh
         y = zeros(n)
         gcand = zeros(n)
     else
-        H(x0, H)
+        H!(state.x, H)
     end
+    kmax = 1000
 
-    function model(s::Vector{Float64}, g::Vector{Float64}, H::Matrix{Float64})
+    function model(s::Vector, g::Vector, H::Matrix)
         return dot(s, g) + 0.5 * dot(s, H * s)
     end
 
-    while dot(state.g, state.g) > δ && state.iter < maxiter
-        if step == truncatedcg
-            state.step = step(state.g, H, state.Δ)
+    while norm(state.g) > state.δ && state.k < nmax
+        if step == tcg
+            state.step = step(H, state.g, state.Δ)
         elseif step == cg
-            state.step = step(H, state.g, x0)
+            state.step = step(H, state.g, state.x)
         end
         state.xcand = state.x + state.step
         fcand = f(state.xcand)
-        state.ρ = (fcand - fx) / model(state.step, state.g, H)
-        if approxH
-            g(state.xcand, gcand)
+        state.ρ = (fcand - fx) / (model(state.step, state.g, H))
+        if approxh
+            g!(state.xcand, gcand)
             y = gcand - state.g
-            H = H(H, y, state.step)
+            H = H!(H, y, state.step)
         end
         if acceptcandidate!(state, tr)
             state.x = copy(state.xcand)
-            if !approxH
-                g(state.x, state.g)
-                H(state.x, H)
+            if !approxh
+                g!(state.x, state.g)
+                H!(state.x, H)
             else
                 state.g = copy(gcand)
             end
             fx = fcand
         end
         updateradius!(state, tr)
-        state.iter += 1
+        state.k += 1
     end
-    return state.x
+    return state.x, state.k
 end
