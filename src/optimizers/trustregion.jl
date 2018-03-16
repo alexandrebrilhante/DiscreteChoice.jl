@@ -10,11 +10,11 @@ function trdefaults()
 end
 
 mutable struct TrustRegionState
-    iter::Int64
-    x::Vector
-    xcand::Vector
-    g::Vector
-    step::Vector
+    k::Int64
+    x::Vector{Float64}
+    xcand::Vector{Float64}
+    g::Vector{Float64}
+    step::Vector{Float64}
     Δ::Float64
     ρ::Float64
     δ::Float64
@@ -42,28 +42,6 @@ function updateradius!(state::TrustRegionState, tr::TrustRegion)
     else
         state.Δ *= tr.γ1
     end
-end
-
-function cg(A::Matrix, b::Vector, x0::Vector, δ::Float64 = 1e-6)
-    n = length(x0)
-    x = x0
-    g = b + A * x
-    d = -g
-    k::Int64 = 0
-    while dot(g, g) > δ
-        Ad = A * d
-        normd = dot(d, Ad)
-        α = -dot(d, g) / normd
-        x += α * d
-        g = b + A * x
-        β = dot(g, Ad) / normd
-        d = -g + β * d
-        k += 1
-    end
-    normd = dot(d, A * d)
-    α = -dot(d, g) / normd
-    x += α * d
-    return x
 end
 
 function tcg(H::Matrix, g::Vector, Δ::Float64)
@@ -114,23 +92,22 @@ function stopcg(normg::Float64, normg0::Float64, k::Int64, kmax::Int64)
     return false
 end
 
-function tr(f::Function, g!::Function, H!::Function,
-            step::Function, x0::Vector, approxh::Bool = false)
-    state::TrustRegionState = TrustRegionState()
+function optimize(f::Function, g::Function, H::Function, step::Function,
+                  x0::Vector{T}, approxh::Bool = false) where {T<:Real}
     tr = trdefaults()
+    state::TrustRegionState = TrustRegionState()
     state.k = 0
     state.x = x0
-    n = length(state.x)
-    state.g = zeros(n)
-    H = eye(n, n)
-    fx = f(state.x)
-    g!(state.x, state.g)
+    state.g = g(state.x)
     state.Δ = 1.0
+    n = length(state.x)
+    d2fx = eye(n, n)
+    fx = f(state.x)
     if approxh
         y = zeros(n)
         gcand = zeros(n)
     else
-        H!(state.x, H)
+        d2fx = H(state.x)
     end
     kmax = 1000
 
@@ -138,25 +115,21 @@ function tr(f::Function, g!::Function, H!::Function,
         return dot(s, g) + 0.5 * dot(s, H * s)
     end
 
-    while norm(state.g) > state.δ && state.k < nmax
-        if step == tcg
-            state.step = step(H, state.g, state.Δ)
-        elseif step == cg
-            state.step = step(H, state.g, state.x)
-        end
+    while norm(state.g) > state.δ && state.k < kmax
+        state.step = step(d2fx, state.g, state.Δ)
         state.xcand = state.x + state.step
         fcand = f(state.xcand)
-        state.ρ = (fcand - fx) / (model(state.step, state.g, H))
+        state.ρ = (fcand - fx) / model(state.step, state.g, d2fx)
         if approxh
-            g!(state.xcand, gcand)
+            gcand = g(state.xcand)
             y = gcand - state.g
-            H = H!(H, y, state.step)
+            d2fx = H(d2fx, y, state.step)
         end
         if acceptcandidate!(state, tr)
             state.x = copy(state.xcand)
             if !approxh
-                g!(state.x, state.g)
-                H!(state.x, H)
+                state.g = g(state.x)
+                d2fx = H(state.x)
             else
                 state.g = copy(gcand)
             end

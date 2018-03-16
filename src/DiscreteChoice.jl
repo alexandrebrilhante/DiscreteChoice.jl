@@ -4,7 +4,8 @@ module DiscreteChoice
     export gradientdescent,
            newton,
            trustregion,
-           hessia
+           hessian
+    end
 
 include("optimizers/gradientdescent.jl")
 include("optimizers/newton.jl")
