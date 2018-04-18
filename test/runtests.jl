@@ -15,7 +15,7 @@ rosenbrock_H(x) = ForwardDiff.hessian(rosenbrock, x);
 @test optimize(rosenbrock, rosenbrock_g, rosenbrock_H, zeros(2))[1] ≈ ones(2)
 
 # Trust region with Steihaug-Toint's method and exact Hessian.
-@test optimize(rosenbrock, rosenbrock_g, rosenbrock_H, tcg, zeros(2))[1] ≈ ones(2)
+@test optimize(rosenbrock, rosenbrock_g, rosenbrock_H, tcg, zeros(2))[2] == 26
 
 # Trust region with Steihaug-Toint's method and approximative Hessian using BFGS.
 @test optimize(rosenbrock, rosenbrock_g, BFGS!, tcg, zeros(2), true)[1] ≈ ones(2)
