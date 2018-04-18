@@ -3,18 +3,22 @@
 using DiscreteChoice, ForwardDiff
 using Base.Test
 
-f(x) =  (1.0 - x[1])^2 + 100.0 * (x[2] - x[1]^2)^2;
+# Rosenbrock.
+rosenbrock(x) = (1.0 - x[1])^2 + 100.0 * (x[2] - x[1]^2)^2;
+rosenbrock_g(x) = ForwardDiff.gradient(rosenbrock, x);
+rosenbrock_H(x) = ForwardDiff.hessian(rosenbrock, x);
 
-g(x) = ForwardDiff.gradient(f, x);
+# Gradient descent.
+@test optimize(rosenbrock, rosenbrock_g, zeros(2), 100000)[1] ≈ ones(2)
 
-H(x) = ForwardDiff.hessian(f, x);
+# Newton.
+@test optimize(rosenbrock, rosenbrock_g, rosenbrock_H, zeros(2))[1] ≈ ones(2)
 
-optimize(f, g, zeros(2))
+# Trust region with Steihaug-Toint's method and exact Hessian.
+@test optimize(rosenbrock, rosenbrock_g, rosenbrock_H, tcg, zeros(2))[1] ≈ ones(2)
 
-optimize(f, g, H, zeros(2))
+# Trust region with Steihaug-Toint's method and approximative Hessian using BFGS.
+@test optimize(rosenbrock, rosenbrock_g, BFGS!, tcg, zeros(2), true)[1] ≈ ones(2)
 
-optimize(f, g, H, tcg, zeros(2))
-
-optimize(f, g, BFGS!, tcg, zeros(2), true)
-
-optimize(f, g, SR1!, tcg, zeros(2), true)
+# Trust region with Steihaug-Toint's method and approximative Hessian using SR1.
+@test optimize(rosenbrock, rosenbrock_g, SR1!, tcg, zeros(2), true)[1] ≈ ones(2)

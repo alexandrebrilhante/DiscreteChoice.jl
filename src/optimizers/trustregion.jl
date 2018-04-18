@@ -1,3 +1,5 @@
+# Trust region method using the truncated conjugate gradient.
+
 struct TrustRegion{T<:Real}
     η1::T
     η2::T
@@ -44,6 +46,8 @@ function updateradius!(state::TrustRegionState, tr::TrustRegion)
     end
 end
 
+
+# Steihaug-Toint's method.
 function tcg(H::Matrix, g::Vector, Δ::Float64)
     n::Int64 = length(g)
     s = zeros(n)
@@ -93,13 +97,14 @@ function stopcg(normg::Float64, normg0::Float64, k::Int64, kmax::Int64)
 end
 
 function optimize(f::Function, g::Function, H::Function, step::Function,
-                  x0::Vector{T}, approxh::Bool = false) where {T<:Real}
+                  x0::Vector{T}, approxh::Bool = false, kmax::Int64 = 5000) where {T<:Real}
     tr = trdefaults()
     state::TrustRegionState = TrustRegionState()
     state.k = 0
     state.x = x0
     state.g = g(state.x)
     state.Δ = 1.0
+    state.δ *= state.δ
     n = length(state.x)
     d2fx = eye(n, n)
     fx = f(state.x)
@@ -109,7 +114,6 @@ function optimize(f::Function, g::Function, H::Function, step::Function,
     else
         d2fx = H(state.x)
     end
-    kmax = 1000
 
     function model(s::Vector, g::Vector, H::Matrix)
         return dot(s, g) + 0.5 * dot(s, H * s)
