@@ -10,7 +10,8 @@ Tools for estimating discrete choice models in Julia.
 
 - Gradient descent
 - Newton
-- Trust region using exact or approximative Hessian
+- Quasi-Newton using BFGS or SR1
+- Trust region using exact Hessian or BFGS or SR1
 
 # Installation
 
@@ -22,6 +23,7 @@ Pkg.clone("https://github.com/brilhana/DiscreteChoice.jl.git")
 
 ```julia
 using DiscreteChoice
+using ForwardDiff
 
 f(x) = (1.0 - x[1])^2 + 100.0 * (x[2] - x[1]^2)^2;
 
