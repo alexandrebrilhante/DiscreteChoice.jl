@@ -19,6 +19,7 @@ Tools for estimating discrete choice models in Julia.
 # Usage
 
 ``jl
+
 using DiscreteChoice
 
 f(x) = (1.0 - x[1])^2 + 100.0 * (x[2] - x[1]^2)^2;
@@ -26,6 +27,7 @@ g(x) = ForwardDiff.gradient(f, x);
 H(x) = ForwardDiff.hessian(f, x);
 
 optimize(f, g, H, tcg, zeros(2))
+
 ``
 
 # Examples
