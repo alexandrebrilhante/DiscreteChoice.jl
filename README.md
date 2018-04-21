@@ -33,4 +33,4 @@ optimize(f, g, H, tcg, zeros(2))
 ```
 
 # Examples
-[Logit][https://github.com/brilhana/DiscreteChoice.jl/blob/master/examples/logit.ipynb]
+[Logit](https://github.com/brilhana/DiscreteChoice.jl/blob/master/examples/logit.ipynb)
