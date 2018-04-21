@@ -1,4 +1,4 @@
-# BFGS.
+# Broyden-Fletcher-Goldfarb-Shanno.
 function BFGS!(B::Matrix, y::Vector, s::Vector)
     n, m = size(B)
     Bs = B * s
