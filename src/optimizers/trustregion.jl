@@ -46,7 +46,6 @@ function updateradius!(state::TrustRegionState, tr::TrustRegion)
     end
 end
 
-
 # Steihaug-Toint's method.
 function tcg(H::Matrix, g::Vector, Δ::Float64)
     n::Int64 = length(g)
@@ -96,8 +95,8 @@ function stopcg(normg::Float64, normg0::Float64, k::Int64, kmax::Int64)
     return false
 end
 
-function optimize(f::Function, g::Function, H::Function, step::Function,
-                  x0::Vector{T}, approxh::Bool = false, kmax::Int64 = 5000) where {T<:Real}
+function optimize(f::Function, g::Function, H::Function, x0::Vector{T},
+                  step::Function; approxh::Bool = false, kmax::Int64 = 5000) where {T<:Real}
     tr = trdefaults()
     state::TrustRegionState = TrustRegionState()
     state.k = 0

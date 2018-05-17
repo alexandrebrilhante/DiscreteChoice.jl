@@ -12,6 +12,7 @@ module DiscreteChoice
 
     include("optimizers/gradientdescent.jl")
     include("optimizers/newton.jl")
+    include("optimizers/quasinewton.jl")
     include("optimizers/trustregion.jl")
     include("utils/hessian.jl")
 
