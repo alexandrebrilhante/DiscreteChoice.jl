@@ -1,24 +1,25 @@
-# TODO: Tests.
-
 using DiscreteChoice, ForwardDiff
 using Base.Test
 
 # Rosenbrock.
-rosenbrock(x) = (1.0 - x[1])^2 + 100.0 * (x[2] - x[1]^2)^2;
-rosenbrock_g(x) = ForwardDiff.gradient(rosenbrock, x);
-rosenbrock_H(x) = ForwardDiff.hessian(rosenbrock, x);
+f(x) = (1.0 - x[1])^2 + 100.0 * (x[2] - x[1]^2)^2;
+g(x) = ForwardDiff.gradient(f, x);
+H(x) = ForwardDiff.hessian(f, x);
 
 # Gradient descent.
-@test optimize(rosenbrock, rosenbrock_g, zeros(2), 100000)[1] ≈ ones(2)
+@test optimize(f, g, zeros(2), 100000)[1] ≈ ones(2)
 
 # Newton.
-@test optimize(rosenbrock, rosenbrock_g, rosenbrock_H, zeros(2))[1] ≈ ones(2)
+@test optimize(f, g, H, zeros(2))[1] ≈ ones(2)
+
+# Quasi-Newton using inverse BFGS.
+@test optimize(f, g, inv_BFGS, zeros(2), true)[1] ≈ ones(2)
 
 # Trust region using Steihaug-Toint's method and exact Hessian.
-@test optimize(rosenbrock, rosenbrock_g, rosenbrock_H, tcg, zeros(2))[1] ≈ ones(2)
+@test optimize(f, g, H, tcg, zeros(2))[1] ≈ ones(2)
 
 # Trust region using Steihaug-Toint's method and approximative Hessian using BFGS.
-@test optimize(rosenbrock, rosenbrock_g, BFGS!, tcg, zeros(2), true)[1] ≈ ones(2)
+@test optimize(f, g, BFGS!, tcg, zeros(2), true)[1] ≈ ones(2)
 
 # Trust region using Steihaug-Toint's method and approximative Hessian using SR1.
-@test optimize(rosenbrock, rosenbrock_g, SR1!, tcg, zeros(2), true)[1] ≈ ones(2)
+@test optimize(f, g, SR1!, tcg, zeros(2), true)[1] ≈ ones(2)

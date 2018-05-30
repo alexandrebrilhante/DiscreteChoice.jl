@@ -8,7 +8,7 @@ function optimize(f::Function, g::Function, H::Function, x0::Vector{T},
     n::Int64 = length(x)
     dfx = ones(n)
     d2fx = eye(n, n)
-    while norm(dfx) > δ && k < kmax && approxh
+    while norm(dfx) > δ && k < kmax
         prev = x
         dfx = g(x)
         x -= d2fx * dfx

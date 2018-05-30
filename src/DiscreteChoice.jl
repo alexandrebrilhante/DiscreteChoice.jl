@@ -8,6 +8,7 @@ module DiscreteChoice
            armijo,
            tcg,
            BFGS!,
+           inv_BFGS,
            SR1!
 
     include("optimizers/gradientdescent.jl")
