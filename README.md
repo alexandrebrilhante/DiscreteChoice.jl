@@ -10,8 +10,8 @@ Tools for estimating discrete choice models in Julia.
 
 - Gradient descent
 - Newton
-- Quasi-Newton using BFGS or SR1
-- Trust region using exact Hessian or BFGS or SR1
+- Quasi-Newton using inverse BFGS
+- Trust region using exact Hessian, BFGS or SR1
 
 ## Installation
 
