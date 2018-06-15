@@ -1,5 +1,6 @@
-using DiscreteChoice, ForwardDiff
-using Base.Test
+using DiscreteChoice
+using ForwardDiff
+using Base.Test # eventually: using Test
 
 # Rosenbrock.
 f(x) = (1.0 - x[1])^2 + 100.0 * (x[2] - x[1]^2)^2;
