@@ -21,7 +21,7 @@ Pkg.clone("https://github.com/brilhana/DiscreteChoice.jl.git")
 
 ## Usage
 
-The function, and its gradient and Hessian depending on the method, must be supplied to the solver by the user.
+The function, and its gradient and Hessian depending on the method, must be supplied to the solver by the user. An easy way to do is to use `ForwardDiff`.
 
 ```julia
 using DiscreteChoice
@@ -39,7 +39,3 @@ optimize(f, g, H, tcg, zeros(2))
 
 ## Examples
 * [Logit](https://github.com/brilhana/DiscreteChoice.jl/blob/master/examples/logit.ipynb)
-
-## TODO
-* Documentation and examples.
-* Implementation of additional models: nest logit, probit.
