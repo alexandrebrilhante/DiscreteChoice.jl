@@ -21,7 +21,7 @@ Pkg.clone("https://github.com/brilhana/DiscreteChoice.jl.git")
 
 ## Usage
 
-The function, and its gradient and Hessian depending on the method, must be supplied to the solver by the user. An easy way to do is to use `ForwardDiff`.
+The function, and its gradient and Hessian, depending on the method, must be supplied to the solver by the user. An easy way to do is to use `ForwardDiff`.
 
 ```julia
 using DiscreteChoice
