@@ -4,7 +4,7 @@
 [![Coverage Status](https://coveralls.io/repos/brilhana/DiscreteChoice.jl/badge.svg?branch=master&service=github)](https://coveralls.io/github/brilhana/DiscreteChoice.jl?branch=master)
 [![codecov.io](http://codecov.io/github/brilhana/DiscreteChoice.jl/coverage.svg?branch=master)](http://codecov.io/github/brilhana/DiscreteChoice.jl?branch=master)
 
-Tools for estimating discrete choice models in Julia.
+Discrete choice modeling and estimation in Julia.
 
 ## Solvers
 
@@ -21,7 +21,7 @@ Pkg.clone("https://github.com/brilhana/DiscreteChoice.jl.git")
 
 ## Usage
 
-The function, and its gradient and Hessian, depending on the method, must be supplied to the solver by the user. An easy way to do is to use `ForwardDiff`.
+The function, and its gradient and Hessian (depending on the method) must be supplied to the solver by the user. An easy way to do it is to use `ForwardDiff`.
 
 ```julia
 using DiscreteChoice
