@@ -7,7 +7,7 @@ function optimize(f::Function, g::Function, H::Function,
     x = x0
     n::Int64 = length(x)
     dfx = ones(n)
-    d2fx = eye(n, n)
+    d2fx = Matrix{Float64}(I, n, n)
     while norm(dfx) > δ && k < kmax
         dfx = g(x)
         d2fx = H(x)

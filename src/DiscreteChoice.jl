@@ -1,20 +1,20 @@
-__precompile__(true)
-
 module DiscreteChoice
 
-    using ForwardDiff
+using LinearAlgebra
 
-    export optimize,
-           armijo,
-           tcg,
-           BFGS!,
-           inv_BFGS,
-           SR1!
+import ForwardDiff
 
-    include("optimizers/gradientdescent.jl")
-    include("optimizers/newton.jl")
-    include("optimizers/quasinewton.jl")
-    include("optimizers/trustregion.jl")
-    include("utils/hessian.jl")
+export optimize,
+       armijo,
+       tcg,
+       BFGS!,
+       inv_BFGS,
+       SR1!
 
-end
+include("optimizers/gradientdescent.jl")
+include("optimizers/newton.jl")
+include("optimizers/quasinewton.jl")
+include("optimizers/trustregion.jl")
+include("utils/hessian.jl")
+
+end # module

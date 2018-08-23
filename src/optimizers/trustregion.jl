@@ -105,7 +105,7 @@ function optimize(f::Function, g::Function, H::Function, step::Function,
     state.Δ = 1.0
     state.δ *= state.δ
     n = length(state.x)
-    d2fx = eye(n, n)
+    d2fx = Matrix{Float64}(I, n, n)
     fx = f(state.x)
     if approxh
         y = zeros(n)
