@@ -16,7 +16,7 @@ Discrete choice modeling and estimation in Julia.
 ## Installation
 
 ```julia
-(v0.7) pkg> add https://github.com/brilhana/DiscreteChoice.jl
+(v1.0) pkg> add https://github.com/brilhana/DiscreteChoice.jl
 ```
 
 ## Usage
