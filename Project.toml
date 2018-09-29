@@ -1,9 +1,11 @@
 name = "DiscreteChoice"
 uuid = "dda0c442-a66a-11e8-001d-3f649ab17762"
-authors = ["brilhana <alexandre.brilhante@gmail.com>"]
+license = "MIT"
+authors = "Fabian Bastin, Alexandre Brilhante, Jean Laprés-Chartrand"
 version = "0.1.0"
 
 [deps]
+Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
 ForwardDiff = "f6369f11-7733-5829-9624-2563aa707210"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
