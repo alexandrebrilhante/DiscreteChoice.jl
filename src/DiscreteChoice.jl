@@ -4,12 +4,22 @@ using LinearAlgebra
 
 import Distributions, ForwardDiff
 
-export optimize,
-       armijo,
+export AG,
+       GradientDescent,
+       Newton,
+       QuasiNewton,
+       RSAG,
+       TrustRegion
+
+export optimize
+
+export armijo,
        tcg,
        BFGS!,
        inv_BFGS,
        SR1!
+
+abstract type Solver end
 
 include("batch/batch.jl")
 

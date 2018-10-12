@@ -1,4 +1,6 @@
-# Trust region method using the truncated conjugate gradient.
+# TODO: create interface for optimize.
+
+struct SteihaugToint <: Solver end
 
 struct TrustRegion{T<:Real}
     η1::T
@@ -46,7 +48,9 @@ function updateradius!(state::TrustRegionState, tr::TrustRegion)
     end
 end
 
-# Steihaug-Toint's method.
+"""
+Steihaug-Toint's method.
+"""
 function tcg(H::Matrix, g::Vector, Δ::Float64)
     n::Int64 = length(g)
     s = zeros(n)
@@ -95,6 +99,9 @@ function stopcg(normg::Float64, normg0::Float64, k::Int64, kmax::Int64)
     return false
 end
 
+"""
+Trust region method using the truncated conjugate gradient.
+"""
 function optimize(f::Function, g::Function, H::Function, step::Function,
                   x0::Vector{T}, approxh::Bool = false; kmax::Int64 = 5000) where {T<:Real}
     tr = trdefaults()

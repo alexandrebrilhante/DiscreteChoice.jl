@@ -1,4 +1,6 @@
-# Gradient descent.
+# TODO: create interface for optimize.
+
+struct GradientDescent <: Solver end
 
 function armijo(f::Function, dfx::Vector, x::Vector, d::Vector;
                 α::Float64 = 1.0, β1::Float64 = 1e-4, β2::Float64 = 0.9)
@@ -12,6 +14,9 @@ function armijo(f::Function, dfx::Vector, x::Vector, d::Vector;
     return α
 end
 
+"""
+Gradient descent.
+"""
 function optimize(f::Function, g::Function, x0::Vector{T},
                   kmax::Int64 = 5000; δ::Float64 = 1e-6) where {T<:Real}
     k::Int64 = 0

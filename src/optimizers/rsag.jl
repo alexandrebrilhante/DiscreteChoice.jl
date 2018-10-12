@@ -1,1 +1,7 @@
-# Randomized stochastic accelerated gradient.
+# TODO: implement method.
+
+struct RSAG <: Solver end
+
+"""
+Randomized stochastic accelerated gradient.
+"""
