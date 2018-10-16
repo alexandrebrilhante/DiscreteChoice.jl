@@ -4,11 +4,11 @@ using LinearAlgebra
 
 import Distributions, ForwardDiff
 
-export AG,
+export AcceleratedGradient,
        GradientDescent,
        Newton,
        QuasiNewton,
-       RSAG,
+       RandomizedStochasticAcceleratedGradient,
        TrustRegion
 
 export optimize

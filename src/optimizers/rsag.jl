@@ -1,6 +1,6 @@
 # TODO: implement method.
 
-struct RSAG <: Solver end
+struct RandomizedStochasticAcceleratedGradient <: Solver end
 
 """
 Randomized stochastic accelerated gradient.
