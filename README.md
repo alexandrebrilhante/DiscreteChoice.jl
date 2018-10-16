@@ -18,7 +18,7 @@ Discrete choice modeling and estimation using stochastic approximation methods i
 * `Newton`
 * `QuasiNewton`
 * `RSAG` (Randomized Stochastic Accelerated Gradient)
-* `SteihaugToint`
+* `TrustRegion` (using Steihaug-Toint)
 
 ## Installation
 

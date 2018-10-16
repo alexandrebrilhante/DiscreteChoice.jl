@@ -1,12 +1,10 @@
-# TODO: create interface for optimize.
-
 struct QuasiNewton <: Solver end
 
 """
 Quasi-Newton using inverse BFGS,
 """
-function optimize(f::Function, g::Function, H::Function, x0::Vector{T},
-                  approxh::Bool; kmax::Int64 = 5000, δ::Float64 = 1e-6) where {T<:Real}
+function optimize(f::Function, g::Function, H::Function, x0::Vector{T}, m::QuasiNewton;
+                  kmax::Int64 = 5000, δ::Float64 = 1e-6) where {T<:Real}
     k::Int64 = 0
     δ *= δ
     x = x0

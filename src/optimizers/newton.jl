@@ -1,12 +1,10 @@
-# TODO create struct and interface for optimize.
-
 struct Newton <: Solver end
 
 """
 Newton.
 """
-function optimize(f::Function, g::Function, H::Function,
-                  x0::Vector{T}; kmax::Int64 = 5000, δ::Float64 = 1e-6) where {T<:Real}
+function optimize(f::Function, g::Function, H::Function, x0::Vector{T}, m::Newton;
+                  kmax::Int64 = 5000, δ::Float64 = 1e-6) where {T<:Real}
     k::Int64 = 0
     δ *= δ
     x = x0

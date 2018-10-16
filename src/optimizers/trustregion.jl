@@ -1,8 +1,6 @@
-# TODO: create interface for optimize.
+struct TrustRegion <: Solver end
 
-struct SteihaugToint <: Solver end
-
-struct TrustRegion{T<:Real}
+struct TrustRegionSize{T<:Real}
     η1::T
     η2::T
     γ1::T
@@ -10,7 +8,7 @@ struct TrustRegion{T<:Real}
 end
 
 function trdefaults()
-    return TrustRegion(0.01, 0.9, 0.5, 0.5)
+    return TrustRegionSize(0.01, 0.9, 0.5, 0.5)
 end
 
 mutable struct TrustRegionState
@@ -30,14 +28,14 @@ mutable struct TrustRegionState
     end
 end
 
-function acceptcandidate!(state::TrustRegionState, tr::TrustRegion)
+function acceptcandidate!(state::TrustRegionState, tr::TrustRegionSize)
     if state.ρ >= tr.η1
         return true
     end
     return false
 end
 
-function updateradius!(state::TrustRegionState, tr::TrustRegion)
+function updateradius!(state::TrustRegionState, tr::TrustRegionSize)
     if state.ρ >= tr.η2
         stepnorm = norm(state.step)
         state.Δ = min(1e20, max(4 * stepnorm, state.Δ))
@@ -102,8 +100,7 @@ end
 """
 Trust region method using the truncated conjugate gradient.
 """
-function optimize(f::Function, g::Function, H::Function, step::Function,
-                  x0::Vector{T}, approxh::Bool = false; kmax::Int64 = 5000) where {T<:Real}
+function optimize(f::Function, g::Function, H::Function, step::Function, x0::Vector{T}, m::TrustRegion, approxh::Bool = false, kmax::Int64 = 5000) where {T<:Real}
     tr = trdefaults()
     state::TrustRegionState = TrustRegionState()
     state.k = 0
